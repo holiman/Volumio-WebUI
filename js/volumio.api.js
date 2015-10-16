@@ -186,7 +186,7 @@ function getPlaylist(json){
                     content += data[i].Album;
                     content += '</span></div></li>';
                     output = output + content;
-                } else {
+                } else if(data[i].file){
                     songpath = parsePath(data[i].file);
                     content += '<div class="pl-entry">';
                     content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
@@ -274,31 +274,30 @@ function parseResponse(inputArr,respType,i,inpath) {
 
 			} else if (inputArr[i].Type == 'MpdDirectory') {
 			// This is a MPD folder
-				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-				content += inputArr[i].directory;
+				content = '<li id="db-' + (i + 1) +
+							'" class="clearfix" data-path="' +
+							inputArr[i].directory + '"><div class="db-icon db-folder db-browse"><i class="fa sx ';
 				showtype = 'file';
 
-				if (inpath != '') {
-				// This is a generic folder not at the root level
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'WEBRADIO') {
-				// This is the WEBRADIO root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'NAS') {
-				// This is the NAS root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'USB') {
-				// This is the USB root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-hdd-o icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'RAMPLAY') {
-				// This is the RAMPLAY root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
+				var mappings = {
+					'WEBRADIO' : 'fa-microphone',
+					'NAS': 'fa-code-fork',
+					'USB' : 'fa-hdd-o',
+					'RAMPLAY': 'fa-spinner',
 				}
+				var _icon = mappings[inputArr[i].directory] || 'fa-folder-open ';
+				content += _icon;
+				var data_target = ' "#context_menu" ';
+
+				if(inpath == '')//root level folder
+				{
+					content += ' icon_root ';
+					data_target = ' "#context_menu_root" ';
+				}
+
+				content += '"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target=';
+				content += data_target;
+				content += '><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
  
 				if (inputArr[i].DisplayName) {
 				// If a DisplayName is available for this entry, use it
